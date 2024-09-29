@@ -1,0 +1,38 @@
+version: '3'
+services:
+  web:
+    build: ./app
+    ports:
+      - "80:8080"
+    networks:
+      - my_network
+    secrets:
+      - db_password
+      - db_root_password
+
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MYSQL_DATABASE: flask_db
+      MYSQL_USER: flask_user
+      MYSQL_PASSWORD_FILE: /run/secrets/db_password
+    volumes:
+      - my_db:/var/lib/mysql
+    secrets:
+      - db_password
+      - db_root_password
+    networks:
+      - my_network
+  
+volumes:
+  my_db:
+  
+networks:
+  my_network:
+
+secrets:
+  db_password:
+    file: ./db_password.txt
+  db_root_password:
+    file: ./db_root_password.txt
